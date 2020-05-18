@@ -4,6 +4,11 @@ const http = require('superagent-promise')(require('superagent'), Promise)
 const aws4 = require('aws4')
 const URL = require('url')
 
+const awsRegion = process.env.AWS_REGION;
+const cognitoUserPoolId = process.env.cognito_user_pool_id;
+const cognitoClientId = process.env.cognito_client_id;
+
+
 const restaurantsApiRoot = process.env.restaurants_api
 const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
 
@@ -41,6 +46,15 @@ module.exports.handler = async (event, context) => {
   const template = loadHtml()
   const restaurants = await getRestaurants()
   const dayOfWeek = days[new Date().getDay()]
+  let view = {
+    dayOfWeek,
+    restaurants,
+    awsRegion,
+    cognitoUserPoolId,
+    cognitoClientId,
+    searchUrl: `${restaurantsApiRoot}/search`
+
+  }
   const html = Mustache.render(template, { dayOfWeek, restaurants })
   const response = {
     statusCode: 200,
